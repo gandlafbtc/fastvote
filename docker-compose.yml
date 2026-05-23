@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./packages/backend
+      dockerfile: Dockerfile
+    container_name: fast-vote-backend
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - fast-vote-network
+
+  frontend:
+    build:
+      context: ./packages/frontend
+      dockerfile: Dockerfile
+    container_name: fast-vote-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - PUBLIC_WS_URL=ws://localhost:3001/ws
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - fast-vote-network
+
+networks:
+  fast-vote-network:
+    driver: bridge
