@@ -108,10 +108,12 @@
 						<div class="badge badge-primary">{wsStore.currentVote.participants.length}</div>
 					</h2>
 					<div class="flex flex-wrap gap-2">
-						{#each wsStore.currentVote.participants as participantId}
+						{#each wsStore.currentVote.participants as participant (participant.userId)}
 							<div class="badge badge-lg">
-								{participantId === userId ? 'You' : participantId.substring(0, 8)}
-								{#if participantId === wsStore.currentVote.creatorId}
+								{participant.userId === userId
+									? 'You'
+									: participant.username || participant.userId.substring(0, 8)}
+								{#if participant.userId === wsStore.currentVote.creatorId}
 									👑
 								{/if}
 							</div>

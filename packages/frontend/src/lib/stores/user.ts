@@ -20,3 +20,8 @@ export function setUsername(username: string) {
 	if (!browser) return;
 	localStorage.setItem('username', username);
 }
+
+export function clearUsername() {
+	if (!browser) return;
+	localStorage.removeItem('username');
+}

@@ -7,6 +7,11 @@ interface VoteItem {
 	suggestedBy: string;
 }
 
+interface Participant {
+	userId: string;
+	username?: string;
+}
+
 interface Vote {
 	id: string;
 	name: string;
@@ -15,7 +20,7 @@ interface Vote {
 	creatorParticipates: boolean;
 	status: 'lobby' | 'voting' | 'finished';
 	items: VoteItem[];
-	participants: string[];
+	participants: Participant[];
 	votes: Record<string, number>;
 	createdAt: number;
 	lobbyEndsAt: number;
@@ -93,8 +98,13 @@ class WebSocketStore {
 				break;
 
 			case 'participant_joined':
-				if (this.currentVote && !this.currentVote.participants.includes(event.userId as string)) {
-					this.currentVote.participants.push(event.userId as string);
+				if (this.currentVote) {
+					const userId = event.userId as string;
+					const username = event.username as string | undefined;
+					const alreadyJoined = this.currentVote.participants.some(p => p.userId === userId);
+					if (!alreadyJoined) {
+						this.currentVote.participants.push({ userId, username });
+					}
 				}
 				break;
 

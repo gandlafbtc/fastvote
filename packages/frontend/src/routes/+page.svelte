@@ -2,13 +2,11 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { wsStore } from '$lib/stores/websocket.svelte';
-	import { getUserId, getUsername, setUsername } from '$lib/stores/user';
 	import { Zap } from '@lucide/svelte';
 
 	let voteName = $state('');
 	let allowSuggestions = $state(true);
 	let creatorParticipates = $state(true);
-	let username = $state(getUsername() || '');
 	let voteIdToJoin = $state('');
 	let lobbyTime = $state(120); // seconds, default 2 minutes
 	let voteTime = $state(10); // seconds, default 10 seconds
@@ -32,10 +30,6 @@
 	function handleCreateVote() {
 		if (!voteName.trim()) return;
 
-		if (username.trim()) {
-			setUsername(username.trim());
-		}
-
 		wsStore.createVote(voteName, allowSuggestions, creatorParticipates, lobbyTime, voteTime);
 
 		// Wait for vote_created event
@@ -49,11 +43,6 @@
 
 	function handleJoinVote() {
 		if (!voteIdToJoin.trim()) return;
-
-		if (username.trim()) {
-			setUsername(username.trim());
-		}
-
 		goto(`/vote/${voteIdToJoin.trim()}/join`);
 	}
 </script>
@@ -75,28 +64,6 @@
 				<span>Connecting to server...</span>
 			</div>
 		{/if}
-
-		<!-- Username Input -->
-		<div class="card bg-base-100 shadow-xl">
-			<div class="card-body">
-				<h2 class="card-title">Your Identity</h2>
-				<div class="form-control flex flex-col gap-2">
-					<label class="label" for="username">
-						<span class="label-text">Username (optional)</span>
-					</label>
-					<input
-						id="username"
-						type="text"
-						placeholder="Enter your name..."
-						class="input input-bordered"
-						bind:value={username}
-					/>
-					<label class="label">
-						<span class="label-text-alt">Your ID: {getUserId().substring(0, 8)}...</span>
-					</label>
-				</div>
-			</div>
-		</div>
 
 		<!-- Create Vote -->
 		<div class="card bg-base-100 shadow-xl">

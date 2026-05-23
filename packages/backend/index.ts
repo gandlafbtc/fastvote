@@ -13,6 +13,11 @@ interface VoteItem {
   suggestedBy: string;
 }
 
+interface Participant {
+  userId: string;
+  username?: string;
+}
+
 interface Vote {
   id: string;
   name: string;
@@ -21,7 +26,7 @@ interface Vote {
   creatorParticipates: boolean;
   status: 'lobby' | 'voting' | 'finished';
   items: VoteItem[];
-  participants: string[];
+  participants: Participant[];
   votes: Record<string, number>;
   createdAt: number;
   lobbyEndsAt: number;
@@ -49,12 +54,22 @@ function broadcastToVote(voteId: string, event: any) {
   const vote = votes.get(voteId);
   if (!vote) return;
 
-  vote.participants.forEach(userId => {
-    const ws = connections.get(userId);
+  // Send to all participants
+  vote.participants.forEach(participant => {
+    const ws = connections.get(participant.userId);
     if (ws) {
       ws.send(JSON.stringify(event));
     }
   });
+
+  // Also send to creator if they're not a participant
+  const creatorIsParticipant = vote.participants.some(p => p.userId === vote.creatorId);
+  if (!creatorIsParticipant) {
+    const creatorWs = connections.get(vote.creatorId);
+    if (creatorWs) {
+      creatorWs.send(JSON.stringify(event));
+    }
+  }
 }
 
 function createVote(userId: string, name: string, allowSuggestions: boolean, creatorParticipates: boolean, lobbyTime: number, voteTime: number): Vote {
@@ -62,6 +77,7 @@ function createVote(userId: string, name: string, allowSuggestions: boolean, cre
   const now = Date.now();
   const lobbyTimeMs = lobbyTime * 1000; // convert seconds to milliseconds
   
+  const ws = connections.get(userId);
   const vote: Vote = {
     id: voteId,
     name,
@@ -70,7 +86,7 @@ function createVote(userId: string, name: string, allowSuggestions: boolean, cre
     creatorParticipates,
     status: 'lobby',
     items: [],
-    participants: [userId],
+    participants: creatorParticipates ? [{ userId, username: ws?.data.username }] : [],
     votes: {},
     createdAt: now,
     lobbyEndsAt: now + lobbyTimeMs,
@@ -79,7 +95,9 @@ function createVote(userId: string, name: string, allowSuggestions: boolean, cre
   };
 
   votes.set(voteId, vote);
-  userVotes.set(userId, voteId);
+  if (creatorParticipates) {
+    userVotes.set(userId, voteId);
+  }
 
   // Auto-start after lobby time
   setTimeout(() => {
@@ -96,11 +114,12 @@ function joinVote(userId: string, voteId: string): Vote | null {
   const vote = votes.get(voteId);
   if (!vote) return null;
 
-  if (!vote.participants.includes(userId)) {
-    vote.participants.push(userId);
+  const alreadyJoined = vote.participants.some(p => p.userId === userId);
+  if (!alreadyJoined) {
+    const ws = connections.get(userId);
+    vote.participants.push({ userId, username: ws?.data.username });
     userVotes.set(userId, voteId);
     
-    const ws = connections.get(userId);
     broadcastToVote(voteId, {
       type: 'participant_joined',
       userId,
@@ -114,7 +133,9 @@ function joinVote(userId: string, voteId: string): Vote | null {
 function suggestItem(userId: string, voteId: string, itemName: string): VoteItem | null {
   const vote = votes.get(voteId);
   if (!vote || vote.status !== 'lobby' || !vote.allowSuggestions) return null;
-  if (!vote.participants.includes(userId)) return null;
+  
+  const isParticipant = vote.participants.some(p => p.userId === userId);
+  if (!isParticipant) return null;
 
   // Check if user already suggested an item
   const existingItem = vote.items.find(item => item.suggestedBy === userId);
@@ -186,7 +207,9 @@ function startVote(userId: string, voteId: string, autoStart = false): boolean {
 function castVote(userId: string, voteId: string, itemId: string): boolean {
   const vote = votes.get(voteId);
   if (!vote || vote.status !== 'voting') return false;
-  if (!vote.participants.includes(userId)) return false;
+  
+  const isParticipant = vote.participants.some(p => p.userId === userId);
+  if (!isParticipant) return false;
   if (!(itemId in vote.votes)) return false;
 
   vote.votes[itemId] = (vote.votes[itemId] || 0) + 1;
@@ -227,9 +250,9 @@ function cleanupOldVotes() {
   for (const [voteId, vote] of votes.entries()) {
     if (now - vote.createdAt > fiveMinutes) {
       // Remove user mappings
-      vote.participants.forEach(userId => {
-        if (userVotes.get(userId) === voteId) {
-          userVotes.delete(userId);
+      vote.participants.forEach(participant => {
+        if (userVotes.get(participant.userId) === voteId) {
+          userVotes.delete(participant.userId);
         }
       });
       votes.delete(voteId);
