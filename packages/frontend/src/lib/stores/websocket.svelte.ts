@@ -99,6 +99,7 @@ class WebSocketStore {
 				break;
 
 			case 'item_suggested':
+			case 'item_added':
 				if (this.currentVote) {
 					const item = event.item as VoteItem;
 					this.currentVote.items.push(item);
@@ -180,6 +181,15 @@ class WebSocketStore {
 	suggestItem(voteId: string, itemName: string) {
 		this.send({
 			type: 'suggest_item',
+			userId: getUserId(),
+			voteId,
+			itemName,
+		});
+	}
+
+	addItem(voteId: string, itemName: string) {
+		this.send({
+			type: 'add_item',
 			userId: getUserId(),
 			voteId,
 			itemName,

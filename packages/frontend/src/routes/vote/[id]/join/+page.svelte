@@ -71,14 +71,10 @@
 				<div class="badge badge-lg badge-info">Joining Vote</div>
 			</div>
 
-			<!-- Success Message -->
-			<div class="alert alert-success">
-				<Check class="w-5 h-5" />
-				<span>Successfully joined the vote!</span>
-			</div>
+	
 
 			<!-- Username Input -->
-			<div class="card bg-base-100 shadow-xl">
+			<!-- <div class="card bg-base-100 shadow-xl">
 				<div class="card-body">
 					<h2 class="card-title">Your Identity</h2>
 					<div class="form-control flex flex-col gap-2">
@@ -98,7 +94,7 @@
 						</label>
 					</div>
 				</div>
-			</div>
+			</div> -->
 
 			<!-- Suggest Item (if enabled) -->
 			{#if wsStore.currentVote.allowSuggestions && wsStore.currentVote.status === 'lobby'}

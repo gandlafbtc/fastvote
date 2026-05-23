@@ -11,6 +11,7 @@
 	const userId = getUserId();
 
 	let joinUrl = $state('');
+	let newItemName = $state('');
 
 	onMount(() => {
 		if (!wsStore.connected) {
@@ -38,6 +39,13 @@
 	function handleStartVote() {
 		if (wsStore.currentVote && wsStore.currentVote.creatorId === userId) {
 			wsStore.startVote(voteId);
+		}
+	}
+
+	function handleAddItem() {
+		if (newItemName.trim() && wsStore.currentVote && wsStore.currentVote.creatorId === userId) {
+			wsStore.addItem(voteId, newItemName.trim());
+			newItemName = '';
 		}
 	}
 
@@ -112,6 +120,36 @@
 				</div>
 			</div>
 
+			<!-- Add Items (Creator Only) -->
+			{#if isCreator}
+				<div class="card bg-base-100 shadow-xl">
+					<div class="card-body">
+						<h2 class="card-title">Add Items</h2>
+						<form
+							onsubmit={(e) => {
+								e.preventDefault();
+								handleAddItem();
+							}}
+							class="flex gap-2"
+						>
+							<input
+								type="text"
+								bind:value={newItemName}
+								placeholder="Enter item name..."
+								class="input input-bordered flex-1"
+								maxlength="100"
+							/>
+							<button type="submit" class="btn btn-primary" disabled={!newItemName.trim()}>
+								Add Item
+							</button>
+						</form>
+						<p class="text-xs opacity-70 mt-2">
+							As the creator, you can add unlimited items to the vote.
+						</p>
+					</div>
+				</div>
+			{/if}
+
 			<!-- Items -->
 			<div class="card bg-base-100 shadow-xl">
 				<div class="card-body">
@@ -129,7 +167,7 @@
 						</p>
 					{:else}
 						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-							{#each wsStore.currentVote.items as item}
+							{#each wsStore.currentVote.items as item (item.id)}
 								<div class="card bg-base-200">
 									<div class="card-body p-4">
 										<h3 class="font-semibold">{item.name}</h3>

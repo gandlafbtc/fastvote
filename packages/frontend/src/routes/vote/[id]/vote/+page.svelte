@@ -5,10 +5,15 @@
 	import { wsStore } from '$lib/stores/websocket.svelte';
 	import { getUserId } from '$lib/stores/user';
 	import Timer from '$lib/components/Timer.svelte';
+	import CountdownOverlay from '$lib/components/CountdownOverlay.svelte';
 	import { Hand } from '@lucide/svelte';
 
 	const voteId = $page.params.id;
 	const userId = getUserId();
+
+	let votingEnabled = $state(false);
+	let showCountdown = $state(false);
+	let hasShownCountdown = $state(false);
 
 	onMount(() => {
 		if (!wsStore.connected) {
@@ -24,14 +29,29 @@
 	});
 
 	$effect(() => {
+		// Show countdown when first arriving at voting page
+		if (wsStore.currentVote?.status === 'voting' && !hasShownCountdown) {
+			showCountdown = true;
+			hasShownCountdown = true;
+			votingEnabled = false;
+		}
+	});
+
+	function handleCountdownComplete() {
+		showCountdown = false;
+		votingEnabled = true;
+	}
+
+	$effect(() => {
 		// Redirect to results when voting finishes
 		if (wsStore.currentVote?.status === 'finished') {
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			goto(`/vote/${voteId}/results`);
 		}
 	});
 
 	function handleVote(itemId: string) {
-		if (voteId) {
+		if (voteId && votingEnabled) {
 			wsStore.castVote(voteId, itemId);
 		}
 	}
@@ -120,6 +140,9 @@
 					{#each displayItems as item (item.id)}
 						<button
 							class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105 active:scale-95"
+							class:opacity-50={!votingEnabled}
+							class:cursor-not-allowed={!votingEnabled}
+							disabled={!votingEnabled}
 							onclick={() => handleVote(item.id)}
 						>
 							<div class="card-body">
@@ -168,3 +191,7 @@
 		{/if}
 	</div>
 </div>
+
+{#if showCountdown}
+	<CountdownOverlay onComplete={handleCountdownComplete} />
+{/if}

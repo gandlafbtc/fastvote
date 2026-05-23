@@ -137,6 +137,28 @@ function suggestItem(userId: string, voteId: string, itemName: string): VoteItem
   return item;
 }
 
+function addItem(userId: string, voteId: string, itemName: string): VoteItem | null {
+  const vote = votes.get(voteId);
+  if (!vote || vote.status !== 'lobby') return null;
+  if (vote.creatorId !== userId) return null; // Only creator can add items
+
+  const item: VoteItem = {
+    id: generateId(),
+    name: itemName,
+    suggestedBy: userId,
+  };
+
+  vote.items.push(item);
+  vote.votes[item.id] = 0;
+
+  broadcastToVote(voteId, {
+    type: 'item_added',
+    item,
+  });
+
+  return item;
+}
+
 function startVote(userId: string, voteId: string, autoStart = false): boolean {
   const vote = votes.get(voteId);
   if (!vote || vote.status !== 'lobby') return false;
@@ -296,6 +318,17 @@ const server = Bun.serve<WSData>({
               ws.send(JSON.stringify({
                 type: 'error',
                 message: 'Cannot suggest item',
+              }));
+            }
+            break;
+          }
+          
+          case 'add_item': {
+            const item = addItem(event.userId, event.voteId, event.itemName);
+            if (!item) {
+              ws.send(JSON.stringify({
+                type: 'error',
+                message: 'Cannot add item',
               }));
             }
             break;
