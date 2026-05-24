@@ -2,7 +2,6 @@
 	import { getLocale, getTextDirection } from '$lib/paraglide/runtime';
 	import { onMount } from 'svelte';
 	import './layout.css';
-	import favicon from '$lib/assets/favicon.svg';
 	import UsernameInput from '$lib/components/UsernameInput.svelte';
 	import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
 	import { getUsername, clearUsername } from '$lib/stores/user';
@@ -64,7 +63,6 @@
 	}
 </script>
 
-<svelte:head><link rel="icon" href={favicon} /></svelte:head>
 
 {#key localeKey}
 	{#if isLoading}
