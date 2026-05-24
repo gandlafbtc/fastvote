@@ -266,7 +266,7 @@ setInterval(cleanupOldVotes, 60 * 1000);
 
 // WebSocket server
 const server = Bun.serve<WSData>({
-  port: 3001,
+  port: Bun.env.PORT?Bun.env.PORT:3001,
   fetch(req, server) {
     const url = new URL(req.url);
     

@@ -17,8 +17,7 @@
 </script>
 
 <div class="flex justify-center">
-    <div class="h-80 w-80 bg-white ">
-
+    <div class="h-80 w-80 bg-white  rounded-xl">
         <!-- eslint-disable-next-line svelte/no-at-html-tags -->
         {@html qr}
     </div>

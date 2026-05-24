@@ -1,5 +1,8 @@
 import { browser } from '$app/environment';
 import { getUserId, getUsername } from './user';
+import { env } from "$env/dynamic/public";
+
+const { PUBLIC_WS_URL } = env
 
 interface VoteItem {
 	id: string;
@@ -43,7 +46,7 @@ class WebSocketStore {
 	connect() {
 		if (!browser) return;
 
-		const wsUrl = 'ws://localhost:3001/ws';
+		const wsUrl = PUBLIC_WS_URL?PUBLIC_WS_URL:'ws://localhost:3001/ws';
 		this.ws = new WebSocket(wsUrl);
 
 		this.ws.onopen = () => {

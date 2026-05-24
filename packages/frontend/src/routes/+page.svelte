@@ -51,11 +51,11 @@
 	<div class="max-w-2xl w-full space-y-8">
 		<!-- Header -->
 		<div class="text-center">
-			<h1 class="text-5xl font-bold text-primary mb-2 flex items-center justify-center gap-3">
+			<h1 class="text-5xl font-bold text-primary mb-2 flex items-center justify-center gap-1">
 				<Zap class="w-12 h-12" />
 				FastVote
 			</h1>
-			<p class="text-lg opacity-70">Real-time voting made simple</p>
+			<p class="text-lg opacity-70">Real-time voting</p>
 		</div>
 
 		<!-- Connection Status -->
@@ -70,18 +70,15 @@
 			<div class="card-body flex flex-col gap-3">
 				<h2 class="card-title">Create a Vote</h2>
 				<div class="form-control flex flex-col gap-2">
-					<label class="label" for="voteName">
-						<span class="label-text">Vote Name</span>
-					</label>
 					<input
 						id="voteName"
 						type="text"
 						placeholder="What are we voting on?"
-						class="input input-bordered"
+						class="input input-bordered w-full input-xl"
 						bind:value={voteName}
 					/>
 				</div>
-				<div class="form-control">
+				<div class="form-control pt-5">
 					<label class="label cursor-pointer">
 						<input type="checkbox" class="checkbox checkbox-primary" bind:checked={allowSuggestions} />
 						<span class="label-text">Allow participants to suggest items</span>
@@ -106,7 +103,7 @@
 						min="10"
 						max="300"
 						step="10"
-						class="range range-primary"
+						class="range range-primary w-full"
 						bind:value={lobbyTime}
 					/>
 					<div class="flex justify-between text-xs opacity-50 px-2">
@@ -127,7 +124,7 @@
 						min="10"
 						max="300"
 						step="10"
-						class="range range-primary"
+						class="range range-primary w-full"
 						bind:value={voteTime}
 					/>
 					<div class="flex justify-between text-xs opacity-50 px-2">
@@ -157,14 +154,11 @@
 			<div class="card-body">
 				<h2 class="card-title">Join a Vote</h2>
 				<div class="form-control flex flex-col gap-2">
-					<label class="label" for="voteId">
-						<span class="label-text">Vote ID</span>
-					</label>
 					<input
 						id="voteId"
 						type="text"
 						placeholder="Enter vote ID..."
-						class="input input-bordered"
+						class="input input-bordered w-full"
 						bind:value={voteIdToJoin}
 					/>
 				</div>

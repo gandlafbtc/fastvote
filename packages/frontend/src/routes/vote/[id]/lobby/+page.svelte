@@ -6,12 +6,14 @@
 	import { getUserId } from '$lib/stores/user';
 	import Timer from '$lib/components/Timer.svelte';
 	import QRCode from '$lib/components/QRCode.svelte';
+	import { Copy, Check } from '@lucide/svelte';
 
 	const voteId = $page.params.id;
 	const userId = getUserId();
 
 	let joinUrl = $state('');
 	let newItemName = $state('');
+	let copied = $state(false);
 
 	onMount(() => {
 		if (!wsStore.connected) {
@@ -49,6 +51,14 @@
 		}
 	}
 
+	function handleCopy(text: string) {
+		navigator.clipboard.writeText(text);
+		copied = true;
+		setTimeout(() => {
+			copied = false;
+		}, 3000);
+	}
+
 	const isCreator = $derived(wsStore.currentVote?.creatorId === userId);
 	const canStart = $derived(
 		isCreator && wsStore.currentVote && wsStore.currentVote.items.length > 0
@@ -78,8 +88,8 @@
 					<div class="card-body">
 						<h2 class="card-title justify-center">Share This Vote</h2>
 						<QRCode url={joinUrl} />
+						<p class="text-sm justify-center opacity-50 mt-2 flex items-center gap-2">Vote ID: {voteId}
 						<div class="text-center mt-4">
-							<p class="text-sm opacity-70 mb-2">Or share this link:</p>
 							<div class="flex gap-2">
 								<input
 									type="text"
@@ -87,14 +97,14 @@
 									value={joinUrl}
 									class="input input-bordered flex-1 text-sm"
 								/>
-								<button
-									class="btn btn-square"
-									onclick={() => navigator.clipboard.writeText(joinUrl)}
-								>
-									📋
+								<button class="btn btn-square" onclick={()=> handleCopy(joinUrl)}>
+									{#if copied}
+										<Check></Check>
+									{:else}
+										<Copy></Copy>
+									{/if}
 								</button>
 							</div>
-							<p class="text-xs opacity-50 mt-2">Vote ID: {voteId}</p>
 						</div>
 					</div>
 				</div>

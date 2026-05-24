@@ -9,9 +9,16 @@
 	const voteId = $page.params.id;
 	const userId = getUserId();
 
+	const MAX_SUGGESTION_LENGTH = 35;
 	let username = $state(getUsername() || '');
 	let itemSuggestion = $state('');
 	let hasSuggested = $state(false);
+	let userSuggestions = $derived(
+		wsStore.currentVote?.items.filter((item) => item.suggestedBy === userId) || []
+	);
+	let otherSuggestions = $derived(
+		wsStore.currentVote?.items.filter((item) => item.suggestedBy !== userId) || []
+	);
 
 	onMount(() => {
 		if (!wsStore.connected) {
@@ -71,36 +78,25 @@
 				<div class="badge badge-lg badge-info">Joining Vote</div>
 			</div>
 
-	
-
-			<!-- Username Input -->
-			<!-- <div class="card bg-base-100 shadow-xl">
-				<div class="card-body">
-					<h2 class="card-title">Your Identity</h2>
-					<div class="form-control flex flex-col gap-2">
-						<label class="label" for="username">
-							<span class="label-text">Username (optional)</span>
-						</label>
-						<input
-							id="username"
-							type="text"
-							placeholder="Enter your name..."
-							class="input input-bordered"
-							bind:value={username}
-							onblur={handleSetUsername}
-						/>
-						<label class="label">
-							<span class="label-text-alt">Your ID: {getUserId().substring(0, 8)}...</span>
-						</label>
-					</div>
-				</div>
-			</div> -->
 
 			<!-- Suggest Item (if enabled) -->
 			{#if wsStore.currentVote.allowSuggestions && wsStore.currentVote.status === 'lobby'}
 				<div class="card bg-base-100 shadow-xl">
 					<div class="card-body">
 						<h2 class="card-title">Suggest an Item</h2>
+									<!-- Other Users' Suggestions -->
+			{#if otherSuggestions.length > 0}
+						<p class="text-sm opacity-70 mb-2">
+							Items suggested by other participants:
+						</p>
+						<div class="flex flex-wrap gap-2">
+							{#each otherSuggestions as suggestion (suggestion.id)}
+								<div class="badge badge-secondary badge-lg">
+									{suggestion.name}
+								</div>
+							{/each}
+				</div>
+			{/if}
 						{#if !hasSuggested}
 							<p class="text-sm opacity-70 mb-4">
 								You can suggest one item for this vote. Make it count!
@@ -109,10 +105,17 @@
 								<input
 									type="text"
 									placeholder="Enter your suggestion..."
-									class="input input-bordered"
+									class="input input-lg input-bordered w-full"
 									bind:value={itemSuggestion}
+									maxlength={MAX_SUGGESTION_LENGTH}
 									onkeydown={(e) => e.key === 'Enter' && handleSuggestItem()}
 								/>
+								<div class="label">
+									<span class="label-text-alt"></span>
+									<span class="label-text-alt">
+										{itemSuggestion.length}/{MAX_SUGGESTION_LENGTH}
+									</span>
+								</div>
 							</div>
 							<div class="card-actions justify-end mt-4">
 								<button
@@ -123,10 +126,21 @@
 									Submit Suggestion
 								</button>
 							</div>
-						{:else}
-							<div class="alert alert-info">
-								<Check class="w-5 h-5" />
-								<span>You've already submitted your suggestion!</span>
+
+						{/if}
+
+						<!-- Display user's suggestions as badges -->
+						{#if userSuggestions.length > 0}
+							<div class="mt-4">
+								<h3 class="text-sm font-semibold mb-2 opacity-70">Your Suggestions:</h3>
+								<div class="flex flex-wrap gap-2">
+									{#each userSuggestions as suggestion (suggestion.id)}
+										<div class="badge badge-primary badge-lg gap-2">
+											<Check class="w-4 h-4" />
+											{suggestion.name}
+										</div>
+									{/each}
+								</div>
 							</div>
 						{/if}
 					</div>
@@ -166,6 +180,8 @@
 					</div>
 				</div>
 			</div>
+
+
 		{:else}
 			<div class="text-center py-20">
 				<span class="loading loading-spinner loading-lg"></span>
