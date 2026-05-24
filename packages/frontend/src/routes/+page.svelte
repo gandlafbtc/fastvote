@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { wsStore } from '$lib/stores/websocket.svelte';
 	import { Zap } from '@lucide/svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	let voteName = $state('');
 	let allowSuggestions = $state(true);
@@ -17,14 +18,14 @@
 
 	function formatTime(seconds: number): string {
 		if (seconds < 60) {
-			return `${seconds} sec`;
+			return m["time.seconds"]({ seconds });
 		}
 		const minutes = Math.floor(seconds / 60);
 		const remainingSeconds = seconds % 60;
 		if (remainingSeconds === 0) {
-			return `${minutes} min`;
+			return m["time.minutes"]({ minutes });
 		}
-		return `${minutes} min ${remainingSeconds} sec`;
+		return m["time.minutesSeconds"]({ minutes, seconds: remainingSeconds });
 	}
 
 	function handleCreateVote() {
@@ -53,27 +54,27 @@
 		<div class="text-center">
 			<h1 class="text-5xl font-bold text-primary mb-2 flex items-center justify-center gap-1">
 				<Zap class="w-12 h-12" />
-				FastVote
+				{m["app.title"]()}
 			</h1>
-			<p class="text-lg opacity-70">Real-time voting</p>
+			<p class="text-lg opacity-70">{m["app.tagline"]()}</p>
 		</div>
 
 		<!-- Connection Status -->
 		{#if !wsStore.connected}
 			<div class="alert alert-warning">
-				<span>Connecting to server...</span>
+				<span>{m["common.connectingToServer"]()}</span>
 			</div>
 		{/if}
 
 		<!-- Create Vote -->
 		<div class="card bg-base-100 shadow-xl">
 			<div class="card-body flex flex-col gap-3">
-				<h2 class="card-title">Create a Vote</h2>
+				<h2 class="card-title">{m["home.createVote"]()}</h2>
 				<div class="form-control flex flex-col gap-2">
 					<input
 						id="voteName"
 						type="text"
-						placeholder="What are we voting on?"
+						placeholder={m["home.votePlaceholder"]()}
 						class="input input-bordered w-full input-xl"
 						bind:value={voteName}
 					/>
@@ -81,20 +82,20 @@
 				<div class="form-control pt-5">
 					<label class="label cursor-pointer">
 						<input type="checkbox" class="checkbox checkbox-primary" bind:checked={allowSuggestions} />
-						<span class="label-text">Allow participants to suggest items</span>
+						<span class="label-text">{m["home.allowSuggestions"]()}</span>
 					</label>
 				</div>
 				<div class="form-control">
 					<label class="label cursor-pointer">
 						<input type="checkbox" class="checkbox checkbox-primary" bind:checked={creatorParticipates} />
-						<span class="label-text">I will participate in voting</span>
+						<span class="label-text">{m["home.creatorParticipates"]()}</span>
 					</label>
 				</div>
 				
 				<!-- Lobby Time Slider -->
 				<div class="form-control flex flex-col gap-2">
 					<label class="label" for="lobbyTime">
-						<span class="label-text">Lobby Time</span>
+						<span class="label-text">{m["home.lobbyTime"]()}</span>
 						<span class="label-text-alt font-semibold">{formatTime(lobbyTime)}</span>
 					</label>
 					<input
@@ -115,7 +116,7 @@
 				<!-- Vote Time Slider -->
 				<div class="form-control flex flex-col gap-2">
 					<label class="label" for="voteTime">
-						<span class="label-text">Vote Time</span>
+						<span class="label-text">{m["home.voteTime"]()}</span>
 						<span class="label-text-alt font-semibold">{formatTime(voteTime)}</span>
 					</label>
 					<input
@@ -139,25 +140,25 @@
 						onclick={handleCreateVote}
 						disabled={!voteName.trim() || !wsStore.connected}
 					>
-						Create Vote
+						{m["home.createButton"]()}
 					</button>
 				</div>
 			</div>
 		</div>
 
 		<div class="divider">
-			<p>or</p>
+			<p>{m["common.or"]()}</p>
 		</div>
 
 		<!-- Join Vote -->
 		<div class="card bg-base-100 shadow-xl">
 			<div class="card-body">
-				<h2 class="card-title">Join a Vote</h2>
+				<h2 class="card-title">{m["home.joinVote"]()}</h2>
 				<div class="form-control flex flex-col gap-2">
 					<input
 						id="voteId"
 						type="text"
-						placeholder="Enter vote ID..."
+						placeholder={m["home.voteIdPlaceholder"]()}
 						class="input input-bordered w-full"
 						bind:value={voteIdToJoin}
 					/>
@@ -168,7 +169,7 @@
 						onclick={handleJoinVote}
 						disabled={!voteIdToJoin.trim() || !wsStore.connected}
 					>
-						Join Vote
+						{m["home.joinButton"]()}
 					</button>
 				</div>
 			</div>

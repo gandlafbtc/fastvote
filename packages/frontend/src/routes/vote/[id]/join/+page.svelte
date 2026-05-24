@@ -5,6 +5,7 @@
 	import { wsStore } from '$lib/stores/websocket.svelte';
 	import { getUserId, getUsername, setUsername } from '$lib/stores/user';
 	import { Check } from '@lucide/svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	const voteId = $page.params.id;
 	const userId = getUserId();
@@ -75,7 +76,7 @@
 			<!-- Header -->
 			<div class="text-center">
 				<h1 class="text-4xl font-bold mb-2">{wsStore.currentVote.name}</h1>
-				<div class="badge badge-lg badge-info">Joining Vote</div>
+				<div class="badge badge-lg badge-info">{m["join.joiningVote"]()}</div>
 			</div>
 
 
@@ -83,11 +84,11 @@
 			{#if wsStore.currentVote.allowSuggestions && wsStore.currentVote.status === 'lobby'}
 				<div class="card bg-base-100 shadow-xl">
 					<div class="card-body">
-						<h2 class="card-title">Suggest an Item</h2>
+						<h2 class="card-title">{m["join.suggestItem"]()}</h2>
 									<!-- Other Users' Suggestions -->
 			{#if otherSuggestions.length > 0}
 						<p class="text-sm opacity-70 mb-2">
-							Items suggested by other participants:
+							{m["join.otherSuggestions"]()}
 						</p>
 						<div class="flex flex-wrap gap-2">
 							{#each otherSuggestions as suggestion (suggestion.id)}
@@ -99,12 +100,12 @@
 			{/if}
 						{#if !hasSuggested}
 							<p class="text-sm opacity-70 mb-4">
-								You can suggest one item for this vote. Make it count!
+								{m["join.suggestDescription"]()}
 							</p>
 							<div class="form-control">
 								<input
 									type="text"
-									placeholder="Enter your suggestion..."
+									placeholder={m["join.suggestionPlaceholder"]()}
 									class="input input-lg input-bordered w-full"
 									bind:value={itemSuggestion}
 									maxlength={MAX_SUGGESTION_LENGTH}
@@ -123,7 +124,7 @@
 									onclick={handleSuggestItem}
 									disabled={!itemSuggestion.trim()}
 								>
-									Submit Suggestion
+									{m["join.submitSuggestion"]()}
 								</button>
 							</div>
 
@@ -132,7 +133,7 @@
 						<!-- Display user's suggestions as badges -->
 						{#if userSuggestions.length > 0}
 							<div class="mt-4">
-								<h3 class="text-sm font-semibold mb-2 opacity-70">Your Suggestions:</h3>
+								<h3 class="text-sm font-semibold mb-2 opacity-70">{m["join.yourSuggestions"]()}</h3>
 								<div class="flex flex-wrap gap-2">
 									{#each userSuggestions as suggestion (suggestion.id)}
 										<div class="badge badge-primary badge-lg gap-2">
@@ -150,12 +151,12 @@
 			<!-- Go to Lobby -->
 			<div class="card bg-base-100 shadow-xl">
 				<div class="card-body">
-					<h2 class="card-title">Ready to Vote?</h2>
+					<h2 class="card-title">{m["join.readyToVote"]()}</h2>
 					<p class="text-sm opacity-70 mb-4">
-						Head to the lobby to see other participants and wait for the vote to start.
+						{m["join.readyDescription"]()}
 					</p>
 					<button class="btn btn-secondary btn-lg w-full" onclick={goToLobby}>
-						Go to Lobby
+						{m["join.goToLobby"]()}
 					</button>
 				</div>
 			</div>
@@ -163,18 +164,18 @@
 			<!-- Vote Info -->
 			<div class="card bg-base-100 shadow-xl">
 				<div class="card-body">
-					<h2 class="card-title">Vote Information</h2>
+					<h2 class="card-title">{m["join.voteInformation"]()}</h2>
 					<div class="space-y-2 text-sm">
 						<p>
-							<span class="font-semibold">Participants:</span>
+							<span class="font-semibold">{m["common.participants"]()}:</span>
 							{wsStore.currentVote.participants.length}
 						</p>
 						<p>
-							<span class="font-semibold">Items:</span>
+							<span class="font-semibold">{m["common.items"]()}:</span>
 							{wsStore.currentVote.items.length}
 						</p>
 						<p>
-							<span class="font-semibold">Status:</span>
+							<span class="font-semibold">{m["common.status"]()}:</span>
 							<span class="badge badge-sm">{wsStore.currentVote.status}</span>
 						</p>
 					</div>
@@ -185,7 +186,7 @@
 		{:else}
 			<div class="text-center py-20">
 				<span class="loading loading-spinner loading-lg"></span>
-				<p class="mt-4">Joining vote...</p>
+				<p class="mt-4">{m["join.joiningVoteLoading"]()}</p>
 			</div>
 		{/if}
 

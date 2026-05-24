@@ -7,6 +7,7 @@
 	import Timer from '$lib/components/Timer.svelte';
 	import QRCode from '$lib/components/QRCode.svelte';
 	import { Copy, Check } from '@lucide/svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	const voteId = $page.params.id;
 	const userId = getUserId();
@@ -71,13 +72,13 @@
 			<!-- Header -->
 			<div class="text-center">
 				<h1 class="text-4xl font-bold mb-2">{wsStore.currentVote.name}</h1>
-				<div class="badge badge-lg badge-warning">Lobby</div>
+				<div class="badge badge-lg badge-warning">{m["lobby.title"]()}</div>
 			</div>
 
 			<!-- Timer -->
 			<div class="card bg-base-100 shadow-xl">
 				<div class="card-body text-center">
-					<h2 class="card-title justify-center">Time Until Auto-Start</h2>
+					<h2 class="card-title justify-center">{m["lobby.timeUntilAutoStart"]()}</h2>
 					<Timer endTime={wsStore.currentVote.lobbyEndsAt} />
 				</div>
 			</div>
@@ -86,9 +87,9 @@
 			{#if isCreator}
 				<div class="card bg-base-100 shadow-xl">
 					<div class="card-body">
-						<h2 class="card-title justify-center">Share This Vote</h2>
+						<h2 class="card-title justify-center">{m["lobby.shareVote"]()}</h2>
 						<QRCode url={joinUrl} />
-						<p class="text-sm justify-center opacity-50 mt-2 flex items-center gap-2">Vote ID: {voteId}
+						<p class="text-sm justify-center opacity-50 mt-2 flex items-center gap-2">{m["lobby.voteId"]()}: {voteId}
 						<div class="text-center mt-4">
 							<div class="flex gap-2">
 								<input
@@ -114,14 +115,14 @@
 			<div class="card bg-base-100 shadow-xl">
 				<div class="card-body">
 					<h2 class="card-title">
-						Participants
+						{m["common.participants"]()}
 						<div class="badge badge-primary">{wsStore.currentVote.participants.length}</div>
 					</h2>
 					<div class="flex flex-wrap gap-2">
 						{#each wsStore.currentVote.participants as participant (participant.userId)}
 							<div class="badge badge-lg">
 								{participant.userId === userId
-									? 'You'
+									? m["lobby.you"]()
 									: participant.username || participant.userId.substring(0, 8)}
 								{#if participant.userId === wsStore.currentVote.creatorId}
 									👑
@@ -136,7 +137,7 @@
 			{#if isCreator}
 				<div class="card bg-base-100 shadow-xl">
 					<div class="card-body">
-						<h2 class="card-title">Add Items</h2>
+						<h2 class="card-title">{m["lobby.addItems"]()}</h2>
 						<form
 							onsubmit={(e) => {
 								e.preventDefault();
@@ -147,16 +148,16 @@
 							<input
 								type="text"
 								bind:value={newItemName}
-								placeholder="Enter item name..."
+								placeholder={m["lobby.itemPlaceholder"]()}
 								class="input input-bordered flex-1"
 								maxlength="100"
 							/>
 							<button type="submit" class="btn btn-primary" disabled={!newItemName.trim()}>
-								Add Item
+								{m["lobby.addItemButton"]()}
 							</button>
 						</form>
 						<p class="text-xs opacity-70 mt-2">
-							As the creator, you can add unlimited items to the vote.
+							{m["lobby.creatorCanAddItems"]()}
 						</p>
 					</div>
 				</div>
@@ -166,15 +167,15 @@
 			<div class="card bg-base-100 shadow-xl">
 				<div class="card-body">
 					<h2 class="card-title">
-						Vote Items
+						{m["lobby.voteItems"]()}
 						<div class="badge badge-secondary">{wsStore.currentVote.items.length}</div>
 					</h2>
 					{#if wsStore.currentVote.items.length === 0}
 						<p class="text-center opacity-70 py-8">
 							{#if wsStore.currentVote.allowSuggestions}
-								Waiting for participants to suggest items...
+								{m["lobby.waitingForSuggestions"]()}
 							{:else}
-								No items yet
+								{m["lobby.noItems"]()}
 							{/if}
 						</p>
 					{:else}
@@ -184,8 +185,8 @@
 									<div class="card-body p-4">
 										<h3 class="font-semibold">{item.name}</h3>
 										<p class="text-xs opacity-70">
-											Suggested by: {item.suggestedBy === userId
-												? 'You'
+											{m["lobby.suggestedBy"]()}: {item.suggestedBy === userId
+												? m["lobby.you"]()
 												: item.suggestedBy.substring(0, 8)}
 										</p>
 									</div>
@@ -205,11 +206,11 @@
 							onclick={handleStartVote}
 							disabled={!canStart}
 						>
-							{canStart ? 'Start Voting Now' : 'Waiting for items...'}
+							{canStart ? m["lobby.startVotingNow"]() : m["lobby.waitingForItems"]()}
 						</button>
 						{#if !canStart && wsStore.currentVote.items.length === 0}
 							<p class="text-center text-sm opacity-70 mt-2">
-								Need at least one item to start voting
+								{m["lobby.needOneItem"]()}
 							</p>
 						{/if}
 					</div>
@@ -218,7 +219,7 @@
 		{:else}
 			<div class="text-center py-20">
 				<span class="loading loading-spinner loading-lg"></span>
-				<p class="mt-4">Loading vote...</p>
+				<p class="mt-4">{m["lobby.loadingVote"]()}</p>
 			</div>
 		{/if}
 

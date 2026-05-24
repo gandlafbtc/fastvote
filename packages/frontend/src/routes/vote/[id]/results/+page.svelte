@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { wsStore } from '$lib/stores/websocket.svelte';
 	import { PartyPopper, Trophy, Medal } from '@lucide/svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	const voteId = $page.params.id;
 
@@ -49,7 +50,7 @@
 			<!-- Header -->
 			<div class="text-center">
 				<h1 class="text-4xl font-bold mb-2">{wsStore.currentVote.name}</h1>
-				<div class="badge badge-lg badge-accent">Results</div>
+				<div class="badge badge-lg badge-accent">{m["results.title"]()}</div>
 			</div>
 
 			<!-- Summary -->
@@ -57,21 +58,21 @@
 				<div class="card-body text-center">
 					<h2 class="text-2xl font-bold flex items-center justify-center gap-2">
 						<PartyPopper class="w-7 h-7" />
-						Voting Complete!
+						{m["results.votingComplete"]()}
 					</h2>
 					<div class="stats stats-vertical lg:stats-horizontal shadow mt-4">
 						<div class="stat">
-							<div class="stat-title">Total Votes</div>
+							<div class="stat-title">{m["results.totalVotes"]()}</div>
 							<div class="stat-value text-primary">{totalVotes}</div>
 						</div>
 						<div class="stat">
-							<div class="stat-title">Participants</div>
+							<div class="stat-title">{m["common.participants"]()}</div>
 							<div class="stat-value text-secondary">
 								{wsStore.currentVote.participants.length}
 							</div>
 						</div>
 						<div class="stat">
-							<div class="stat-title">Items</div>
+							<div class="stat-title">{m["common.items"]()}</div>
 							<div class="stat-value text-accent">{wsStore.currentVote.items.length}</div>
 						</div>
 					</div>
@@ -81,7 +82,7 @@
 			<!-- Results -->
 			<div class="card bg-base-100 shadow-xl">
 				<div class="card-body">
-					<h2 class="card-title text-2xl mb-4">Final Rankings</h2>
+					<h2 class="card-title text-2xl mb-4">{m["results.finalRankings"]()}</h2>
 					<div class="space-y-4">
 						{#each sortedResults as result, index (result.id)}
 							{@const percentage = maxVotes > 0 ? (result.count / maxVotes) * 100 : 0}
@@ -92,7 +93,7 @@
 										<div>
 											<h3 class="text-xl font-semibold">{result.name}</h3>
 											<p class="text-sm opacity-70">
-												{result.count} {result.count === 1 ? 'vote' : 'votes'}
+												{result.count} {result.count === 1 ? m["common.vote"]() : m["common.votes"]()}
 											</p>
 										</div>
 									</div>
@@ -129,14 +130,14 @@
 			<div class="card bg-base-100 shadow-xl">
 				<div class="card-body">
 					<button class="btn btn-primary btn-lg w-full" onclick={goHome}>
-						Create Another Vote
+						{m["results.createAnother"]()}
 					</button>
 				</div>
 			</div>
 		{:else}
 			<div class="text-center py-20">
 				<span class="loading loading-spinner loading-lg"></span>
-				<p class="mt-4">Loading results...</p>
+				<p class="mt-4">{m["results.loadingResults"]()}</p>
 			</div>
 		{/if}
 

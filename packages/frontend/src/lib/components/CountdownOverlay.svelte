@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	interface Props {
 		onComplete?: () => void;
@@ -12,7 +13,7 @@
 	let fadeClass = $state('fade-in');
 
 	onMount(() => {
-		const sequence = [3, 2, 1, 'GO!'];
+		const sequence = [3, 2, 1, m["vote.countdown.go"]()];
 		let index = 0;
 
 		const interval = setInterval(() => {

@@ -7,6 +7,7 @@
 	import Timer from '$lib/components/Timer.svelte';
 	import CountdownOverlay from '$lib/components/CountdownOverlay.svelte';
 	import { Hand } from '@lucide/svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	const voteId = $page.params.id;
 	const userId = getUserId();
@@ -80,13 +81,13 @@
 			<!-- Header -->
 			<div class="text-center">
 				<h1 class="text-4xl font-bold mb-2">{wsStore.currentVote.name}</h1>
-				<div class="badge badge-lg badge-success">Voting Active</div>
+				<div class="badge badge-lg badge-success">{m["vote.votingActive"]()}</div>
 			</div>
 
 			<!-- Timer -->
 			<div class="card bg-base-100 shadow-xl">
 				<div class="card-body text-center">
-					<h2 class="card-title justify-center text-success">Time Remaining</h2>
+					<h2 class="card-title justify-center text-success">{m["vote.timeRemaining"]()}</h2>
 					{#if wsStore.currentVote.votingEndsAt}
 						<Timer endTime={wsStore.currentVote.votingEndsAt} />
 					{/if}
@@ -96,7 +97,7 @@
 			<!-- Instructions -->
 			<div class="alert alert-info">
 				<Hand class="w-5 h-5" />
-				<span>Tap items to vote! You can vote multiple times.</span>
+				<span>{m["vote.instructions"]()}</span>
 			</div>
 
 			<!-- Vote Items -->
@@ -119,7 +120,7 @@
 										<h3 class="text-2xl font-bold mb-2">{item.name}</h3>
 										<div class="flex items-center gap-4">
 											<span class="text-3xl font-bold text-primary">{voteCount}</span>
-											<span class="text-sm opacity-70">votes</span>
+											<span class="text-sm opacity-70">{m["common.votes"]()}</span>
 										</div>
 										<!-- Progress bar -->
 										<div class="w-full bg-base-300 rounded-full h-3 mt-3">
@@ -151,7 +152,7 @@
 									<span class="text-4xl font-bold text-primary">
 										{wsStore.currentVote?.votes[item.id] || 0}
 									</span>
-									<span class="text-sm opacity-70">votes</span>
+									<span class="text-sm opacity-70">{m["common.votes"]()}</span>
 								</div>
 								<!-- Progress bar -->
 								<div class="w-full bg-base-300 rounded-full h-2 mt-2">
@@ -174,13 +175,13 @@
 			{/if}
 		{:else if wsStore.currentVote?.status === 'lobby'}
 			<div class="text-center py-20">
-				<h2 class="text-2xl font-bold mb-4">Waiting for vote to start...</h2>
+				<h2 class="text-2xl font-bold mb-4">{m["vote.waitingToStart"]()}</h2>
 				<span class="loading loading-spinner loading-lg"></span>
 			</div>
 		{:else}
 			<div class="text-center py-20">
 				<span class="loading loading-spinner loading-lg"></span>
-				<p class="mt-4">Loading vote...</p>
+				<p class="mt-4">{m["vote.loadingVote"]()}</p>
 			</div>
 		{/if}
 
