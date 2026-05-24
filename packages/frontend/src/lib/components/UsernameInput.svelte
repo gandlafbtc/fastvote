@@ -21,7 +21,6 @@
 	<div class="absolute top-4 right-4">
 		<LanguageSwitcher />
 	</div>
-
 	<div class="max-w-md w-full">
 		<div class="card bg-base-100 shadow-xl">
 			<div class="card-body">

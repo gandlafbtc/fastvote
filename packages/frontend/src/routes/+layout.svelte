@@ -9,7 +9,7 @@
 	import UsernameInput from '$lib/components/UsernameInput.svelte';
 	import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
 	import { getUsername, clearUsername } from '$lib/stores/user';
-	import { LogOut } from '@lucide/svelte';
+	import { LogOut, CodeXml, Zap } from '@lucide/svelte';
 	import * as m from '$lib/paraglide/messages';
 
 	let { children } = $props();
@@ -63,10 +63,22 @@
 	<!-- Main Content -->
 
 	<div class="flex min-h-screen flex-col">
-		<!-- Language Switcher - Top Left -->
-		<div class="absolute top-4 right-4 z-50">
+	<div class="h-10 grid grid-cols-3 items-center justify-between">
+		<a
+			href="https://github.com/gandlafbtc/fastvote"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="btn btn-ghost btn-sm btn-square"
+			aria-label="View source on GitHub"
+		>
+			<CodeXml class="h-5 w-5" />
+		</a>
+		<a class="btn btn-ghost text-primary" href="/"><Zap></Zap> FastVote</a>
+		<div class="flex justify-end">
+
 			<LanguageSwitcher />
 		</div>
+	</div>
 
 		<div class="flex-1">{@render children()}</div>
 		<!-- Footer -->
