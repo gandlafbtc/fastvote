@@ -20,9 +20,12 @@
 	};
 
 	function handleLocaleChange(locale: 'en' | 'ko-kr' | 'es' | 'de') {
-		setLocale(locale);
+		setLocale(locale, { reload: false });
 		currentLocale = locale;
 		isOpen = false;
+		
+		// Dispatch custom event to notify layout of locale change
+		window.dispatchEvent(new CustomEvent('locale-change'));
 	}
 
 	function toggleDropdown() {
